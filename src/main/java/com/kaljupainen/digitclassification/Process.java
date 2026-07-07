@@ -13,7 +13,6 @@ import java.util.Scanner;
 public class Process {
     
 private final DataGenerator dataGenerator = new DataGenerator();
-    private final DistanceCalculator distanceCalculator = new DistanceCalculator();
 
     public static void main(String[] args) {
         System.out.println("Process started");
@@ -44,53 +43,66 @@ private final DataGenerator dataGenerator = new DataGenerator();
         
         // Generate train data
 
+        System.out.println("[1] Generating training data");
+        
         List<Digit> trainedData = new ArrayList<>();
-        for (int i = 0; i < numberOfTrainElements / 3; i++) {
+        for (int i = 0; i < (numberOfTrainElements / 3) - 1; i++) {
             trainedData.add(
-                new Digit(dataGenerator.generateData("cross", noiseLevel), "cross"));
+                new Digit(dataGenerator.generateData("cross", noiseLevel, true), "cross"));
         }
 
-        for (int i = 0; i < numberOfTrainElements / 3; i++) {
+        trainedData.add(
+                new Digit(dataGenerator.generateData("cross", noiseLevel, false), "cross"));
+
+        for (int i = 0; i < (numberOfTrainElements / 3) - 1; i++) {
             trainedData.add(
-                new Digit(dataGenerator.generateData("plus", noiseLevel), "plus"));
+                new Digit(dataGenerator.generateData("plus", noiseLevel, true), "plus"));
         }
 
-        for (int i = 0; i < numberOfTrainElements / 3; i++) {
+        trainedData.add(
+                new Digit(dataGenerator.generateData("plus", noiseLevel, false), "plus"));
+
+        for (int i = 0; i < (numberOfTrainElements / 3) - 1; i++) {
             trainedData.add(
-                new Digit(dataGenerator.generateData("square", noiseLevel), "square"));
+                new Digit(dataGenerator.generateData("square", noiseLevel, true), "square"));
         }
 
-        System.out.println("Train data generated");
+        trainedData.add(
+                new Digit(dataGenerator.generateData("square", noiseLevel, false), "square"));
+
+        System.out.println("[2] Train data generated, starting testing");
 
         Random random = new Random();
 
         for (int k = 0; k < numberOfTestElements; k++) {
         	
-            int numero = random.nextInt(3); // genera 0, 1 o 2
+            int numero = random.nextInt(3);
           
             Digit testMatrix = null;
             switch(numero) {
             case 0:
                 /* Generate a test matrix */
-                testMatrix = new Digit(dataGenerator.generateData("cross", noiseLevel), "cross");
+                testMatrix = new Digit(dataGenerator.generateData("cross", noiseLevel, true), "cross");
                 break;
             case 1:
-                testMatrix = new Digit(dataGenerator.generateData("plus", noiseLevel), "plus");
+                testMatrix = new Digit(dataGenerator.generateData("plus", noiseLevel, true), "plus");
             		break;
             case 2:
-                testMatrix = new Digit(dataGenerator.generateData("square", noiseLevel), "square");
+                testMatrix = new Digit(dataGenerator.generateData("square", noiseLevel, true), "square");
             		break;
             }
  
-
+            
+            System.out.println("[" + (k + 3) + ".1] Testing figure:\n");
             DigitsUtil.paintMatrix(testMatrix.getMatrix());
+            System.out.println("\n");
 
             /* Classify the test matrix */
             double smallerDistance = Integer.MAX_VALUE;
             int closerIndex = -1;
             for (int i = 0; i < trainedData.size(); i++) {
                 // Find the closer element
-                double currentDistance = distanceCalculator.jaccardDistance(testMatrix.getMatrix(),
+                double currentDistance = DistanceCalculator.jaccardDistance(testMatrix.getMatrix(),
                  trainedData.get(i).getMatrix());
                 if (currentDistance < smallerDistance) {
                     smallerDistance = currentDistance;
@@ -99,9 +111,9 @@ private final DataGenerator dataGenerator = new DataGenerator();
             }
 
             if (closerIndex >= 0) {
-            		System.out.println("More similar to: " + trainedData.get(closerIndex).getType());
+            		System.out.println("[" + (k + 3) + ".2]More similar to: " + trainedData.get(closerIndex).getType() + "\n");
             } else {
-            		System.out.println("FAIL TO CLASSIFY");
+            		System.out.println("[" + (k + 3) + ".2]FAIL TO CLASSIFY\n");
             }
             
         }

@@ -32,7 +32,7 @@ public class DataGenerator {
         {1, 1, 1, 1, 1, 1, 1}
     };
 
-public int[][] generateData(String elementType, float difference) {
+public int[][] generateData(String elementType, float difference, boolean applyNoise) {
         /* This will receive the base elements and generate a matrix
         similar to the base elements but with some noise */
  
@@ -48,7 +48,6 @@ public int[][] generateData(String elementType, float difference) {
 	        		break;
 	        	case "plus":
 	        		baseElement[i] = basePlus[i].clone();
-	        		baseElement = basePlus.clone();
 	        		break;
 	        	case "square":
 	        		baseElement[i] = baseSquare[i].clone();
@@ -56,14 +55,16 @@ public int[][] generateData(String elementType, float difference) {
 	        	}
         }
         
-        // Apply noise to the base element
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 7; j++) {
-                // Add some random noise (X% chance of flipping a bit)
-                if (Math.random() < difference) {
-                    baseElement[i][j] = 1 - baseElement[i][j];
-                }
-            }
+        if (applyNoise) {
+	        // Apply noise to the base element
+	        for (int i = 0; i < 7; i++) {
+	            for (int j = 0; j < 7; j++) {
+	                // Add some random noise (X% chance of flipping a bit)
+	                if (Math.random() < difference) {
+	                    baseElement[i][j] = 1 - baseElement[i][j];
+	                }
+	            }
+	        }
         }
 
        return baseElement;
