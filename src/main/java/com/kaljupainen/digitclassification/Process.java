@@ -7,6 +7,8 @@ import com.kaljupainen.digitclassification.beans.Digit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
 
 public class Process {
     
@@ -20,19 +22,26 @@ private final DataGenerator dataGenerator = new DataGenerator();
     
     public void process() {
         System.out.println("Processing...");
+        Scanner scanner = new Scanner(System.in);
 
         /* Read the number of train elements from user */
         System.out.print("Enter the number of train elements: ");
-        int numberOfTrainElements = Integer.parseInt(System.console().readLine());
+        int numberOfTrainElements = Integer.parseInt(scanner.nextLine());
 
         /* Read the number of test elements from user */
         System.out.print("Enter the number of test elements: ");
-        int numberOfTestElements = Integer.parseInt(System.console().readLine());
+        int numberOfTestElements = Integer.parseInt(scanner.nextLine());
 
         /* Read the noise level from user */
         System.out.print("Enter the noise level: ");
-        float noiseLevel = Float.parseFloat(System.console().readLine());
+        float noiseLevel = Float.parseFloat(scanner.nextLine());
 
+        System.out.println("---------------------------------------------------");
+        System.out.println("Number of train element: " + numberOfTrainElements);
+        System.out.println("Number of test element: " + numberOfTestElements);
+        System.out.println("Noise level: " + noiseLevel);
+        System.out.println("---------------------------------------------------");
+        
         // Generate train data
 
         List<Digit> trainedData = new ArrayList<>();
@@ -53,9 +62,26 @@ private final DataGenerator dataGenerator = new DataGenerator();
 
         System.out.println("Train data generated");
 
+        Random random = new Random();
+
         for (int k = 0; k < numberOfTestElements; k++) {
-            /* Generate a test matrix */
-            Digit testMatrix = new Digit(dataGenerator.generateData("cross", 1f), "cross");
+        	
+            int numero = random.nextInt(3); // genera 0, 1 o 2
+          
+            Digit testMatrix = null;
+            switch(numero) {
+            case 0:
+                /* Generate a test matrix */
+                testMatrix = new Digit(dataGenerator.generateData("cross", noiseLevel), "cross");
+                break;
+            case 1:
+                testMatrix = new Digit(dataGenerator.generateData("plus", noiseLevel), "plus");
+            		break;
+            case 2:
+                testMatrix = new Digit(dataGenerator.generateData("square", noiseLevel), "square");
+            		break;
+            }
+ 
 
             DigitsUtil.paintMatrix(testMatrix.getMatrix());
 
@@ -72,7 +98,12 @@ private final DataGenerator dataGenerator = new DataGenerator();
                 }
             }
 
-            System.out.println("More similar to: " + trainedData.get(closerIndex).getType());
+            if (closerIndex >= 0) {
+            		System.out.println("More similar to: " + trainedData.get(closerIndex).getType());
+            } else {
+            		System.out.println("FAIL TO CLASSIFY");
+            }
+            
         }
 
         System.exit(-1);
